@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style5.css">
+    <title>Agregar Producto</title>
+</head>
+
+
+<body>
+
+    <div class="side-menu">
+        <div class="brand-name">
+            <h1>¡Bienvenido Administrador!</h1>
+        </div>
+        <div class="menu-links">
+            <a href="/Vista_AdminV2.0/agregarUsua.html" class="menu-item">Agregar Usuarios</a>
+            <a href="/Vista_AdminV2.0/actualizarUsua.html" class="menu-item">Ver Usuarios</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <div class="nav">
+                <div class="toggle-menu">
+                    <button id="menu-toggle" class="btn">☰ Menú</button>
+                </div>
+                <img src="img/logo.png" alt="Logo">
+                <div class="user">
+                    <a href="index.html" class="btn">Pedidos</a>
+                    <a href="menu.html" class="btn">Menú</a>
+                    <a href="Agregarmenu.html" class="btn">Agregar Producto</a>
+                    <a href="/index.html" class="btn">Salir</a>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="container1">
+            <h2>Registrar Nuevo Producto</h2>
+            <form id="registroForm">
+                <label for="tipo">Tipo de Producto:</label>
+                <input type="text" id="tipo" name="tipo" required>
+
+                <label for="descripcion">Descripción:</label>
+                <textarea id="descripcion" name="descripcion" required></textarea><br>
+
+                <label for="precio">Precio:</label>
+                <input type="number" id="precio" name="precio" required step="0.01" min="0"> <!-- min="0" evita precios negativos -->
+
+                <button type="submit">Agregar</button>
+            </form>
+            <p id="mensaje"></p>
+        </div>
+    </div>
+    
+    
+    <script>
+        document.getElementById('registroForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const formData = new FormData(event.target);
+            const datos = Object.fromEntries(formData.entries());
+
+            const mensajeElement = document.getElementById('mensaje');
+
+            try {
+                const response = await fetch('/guardarprod', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(datos)
+                });
+
+                if (response.ok) {
+                    mensajeElement.textContent = 'Producto registrado con éxito';
+                    // Redirige después de un breve tiempo
+                    setTimeout(() => {
+                        window.location.href = '/Vista_AdminV2.0/';
+                    }, 2000); // Redirige después de 2 segundos
+                } else {
+                    const errorText = await response.text();
+                    mensajeElement.textContent = `Error: ${errorText}`;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        });
+    </script>
+
+    <script src="menu.js"></script>
+
+</body>
+</html>

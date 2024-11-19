@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style5.css">
+    <title>Editar Usuario</title>
+</head>
+
+<body>
+
+    <div class="side-menu">
+        <div class="brand-name">
+            <h1>¡Bienvenido Administrador!</h1>
+        </div>
+        <div class="menu-links">
+            <a href="/Vista_AdminV2.0/agregarUsua.html" class="menu-item">Agregar Usuarios</a>
+            <a href="/Vista_AdminV2.0/actualizarUsua.html" class="menu-item">Ver Usuarios</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <div class="nav">
+                <div class="toggle-menu">
+                    <button id="menu-toggle" class="btn">☰ Menú</button>
+                </div>
+                <img src="img/logo.png" alt="Logo">
+                <div class="user">
+                    <a href="index.html" class="btn">Pedidos</a>
+                    <a href="menu.html" class="btn">Menú</a>
+                    <a href="Agregarmenu.html" class="btn">Agregar Producto</a>
+                    <a href="/index.html" class="btn">Salir</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="container1">
+            <h1>Editar Usuario</h1>
+            <form id="editar-usuario-form">
+                <input type="hidden" id="user-id">
+                <input type="hidden" id="user-rol">
+                <label for="nombre">Nombre:</label>
+                <input type="text" id="nombre" required>
+                <br>
+                <label for="apellido">Apellido:</label>
+                <input type="text" id="apellido" required>
+                <br>
+                <label for="telefono">Teléfono:</label>
+                <input type="text" id="telefono" required>
+                <br>
+                <label for="correo">Correo:</label>
+                <input type="email" id="correo" required>
+                <br>
+                <button type="submit">Actualizar</button>
+            </form>
+        </div>
+    </div>    
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const id = urlParams.get('id');
+
+            if (!id) {
+                Swal.fire({
+                    title: '¡ID incorrecto!',
+                    text: 'ID de usuario no proporcionado',
+                    icon: 'error', 
+                    toast: true,
+                    position: 'top',
+                    showConfirmButton: true,
+                    confirmButtonText: 'Aceptar',
+                    showCancelButton: true,
+                    customClass: {
+                        confirmButton: 'custom-btn'
+                    }
+                })
+                window.location.href = '/Vista_AdminV2.0/index.html';
+                return;
+            }
+
+            fetch(`/api/usuarios/${id}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.length === 0) {
+                        Swal.fire({
+                            title: '¡Usuario incorrecto!',
+                            text: 'Usuario no encontrado',
+                            icon: 'warning', 
+                            toast: true,
+                            position: 'top',
+                            showConfirmButton: true,
+                            confirmButtonText: 'Aceptar',
+                            showCancelButton: true,
+                            customClass: {
+                                confirmButton: 'custom-btn'
+                            }
+                        })
+                        window.location.href = '/Vista_AdminV2.0/index.html';
+                        return;
+                    }
+
+                    const usuario = data[0];
+                    document.getElementById('user-id').value = usuario.id_usuario;
+                    document.getElementById('user-rol').value = usuario.rol;
+                    document.getElementById('nombre').value = usuario.nombre;
+                    document.getElementById('apellido').value = usuario.apellido;
+                    document.getElementById('telefono').value = usuario.telefono;
+                    document.getElementById('correo').value = usuario.correo;
+                })
+                .catch(error => {
+                    console.error('Error al obtener los datos del usuario:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error al obtener los datos del usuario',
+                        text: error.message,
+                        toast: true,
+                        position: 'top',
+                        showConfirmButton: true,
+                        confirmButtonText: 'Aceptar',
+                        showCancelButton: true,
+                        cancelButtonText: 'Cancelar',
+                        customClass: {
+                            confirmButton: 'custom-btn',
+                            cancelButton: 'custom-btn-secondary'
+                        }
+                    });
+                });
+
+            document.getElementById('editar-usuario-form').addEventListener('submit', (event) => {
+                event.preventDefault();
+
+                console.log("Formulario de actualización enviado.");
+
+                const id = document.getElementById('user-id').value;
+                const nombre = document.getElementById('nombre').value;
+                const apellido = document.getElementById('apellido').value;
+                const telefono = document.getElementById('telefono').value;
+                const correo = document.getElementById('correo').value;
+                const rol = document.getElementById('user-rol').value;
+
+                const contraseña = generarContraseñaAleatoria();
+
+                fetch(`/api/usuarios/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ nombre, apellido, telefono, correo, contraseña, rol })
+                })
+                .then(response => response.text())
+                .then(text => {
+                    console.log('Respuesta del servidor:', text);
+                    if (text === 'Usuario actualizado con éxito') {
+                        Swal.fire({
+                            icon: 'success',
+                            title: '¡Usuario actualizado!',
+                            text: 'Usuario actualizado con éxito',
+                            toast: true,
+                            position: 'top',
+                            showConfirmButton: true,
+                            confirmButtonText: 'Aceptar',
+                            customClass: {
+                                confirmButton: 'custom-btn'
+                            }
+                        }).then(() => {
+                            window.location.href = '/Vista_AdminV2.0/index.html';
+                        });
+                    } else {
+                        throw new Error(text);
+                    }                
+                })
+                .catch(error => {
+                    console.error('Error al actualizar el usuario:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error al actualizar el usuario',
+                        text: 'Error: ' + error.message,
+                        toast: true,
+                        position: 'top',
+                        showConfirmButton: true,
+                        confirmButtonText: 'Aceptar',
+                        showCancelButton: true,
+                        customClass: {
+                            confirmButton: 'custom-btn'
+                        }
+                    });
+                });                
+            });
+
+            function generarContraseñaAleatoria() {
+                const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+                let contraseña = '';
+                const longitud = 12;
+
+                for (let i = 0; i < longitud; i++) {
+                    const indice = Math.floor(Math.random() * caracteres.length);
+                    contraseña += caracteres.charAt(indice);
+                }
+                return contraseña;
+            }
+        });
+    </script>
+     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="menu.js"></script>
+
+</body>
+</html>

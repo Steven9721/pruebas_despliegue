@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style2.css">
+    <title>Administrador Panel</title>
+</head>
+
+<body>
+    <div class="side-menu">
+        <div class="brand-name">
+            <h1>¡Bienvenido Administrador!</h1>
+        </div>
+        <div class="menu-links">
+            <a href="/Vista_AdminV2.0/agregarUsua.html" class="menu-item">Agregar Usuarios</a>
+            <a href="/Vista_AdminV2.0/actualizarUsua.html" class="menu-item">Ver Usuarios</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <div class="nav">
+                <div class="toggle-menu">
+                    <button id="menu-toggle" class="btn">☰ Menú</button>
+                </div>
+                <img src="img/logo.png" alt="Logo">
+                <div class="user">
+                    <a href="index.html" class="btn">Pedidos</a>
+                    <a href="menu.html" class="btn">Menú</a>
+                    <a href="Agregarmenu.html" class="btn">Agregar Producto</a>
+                    <a href="/index.html" class="btn">Salir</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-2">
+            <div class="orders-box">
+                <h3>Usuarios Registrados</h3>
+                <div class="entries-controls">
+                    <label for="entries">Mostrar</label>
+                    <select id="entries">
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                    </select>
+                    <span>entradas por página</span>
+                </div>
+                <input type="text" id="search" placeholder="Buscar...">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Apellido</th>
+                            <th>Teléfono</th>
+                            <th>Correo</th>
+                            <th>Rol</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="usuarios-tbody">
+                        <!-- Los datos de los usuarios se cargarán aquí -->
+                    </tbody>
+                   
+                </table>
+                <div class="pagination-info">
+                    <p id="pagination-text">Mostrando 1 a 5 de 5 entradas</p>
+                    <div class="pagination-controls">
+                        <a href="#" id="first">Primero</a>
+                        <a href="#" id="previous">Anterior</a>
+                        <span id="page-number">1</span>
+                        <a href="#" id="next">Siguiente</a>
+                        <a href="#" id="last">Último</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        
+   
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch('/api/usuarios')
+                .then(response => response.json())
+                .then(data => {
+                    const tbody = document.getElementById('usuarios-tbody');
+                    data.forEach(usuario => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${usuario.id_usuario}</td>
+                            <td>${usuario.nombre}</td>
+                            <td>${usuario.apellido}</td>
+                            <td>${usuario.telefono}</td>
+                            <td>${usuario.correo}</td>
+                            <td>${usuario.rol}</td>
+                            <td>
+                                <button class="editar" onclick="editarUsuario(${usuario.id_usuario})">Editar</button>
+                                <button class="eliminar" onclick="eliminarUsuario(${usuario.id_usuario})">Eliminar</button>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error al obtener usuarios:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: '¡Hubo Un Error!',
+                        text: 'Error al eliminar el usuario',
+                        toast: true,
+                        position: 'top',
+                        showConfirmButton: true,
+                        confirmButtonText: 'Aceptar',
+                        customClass: {
+                            confirmButton: 'custom-btn'
+                        }
+                    });
+                });
+                
+        });
+
+        function editarUsuario(id) {
+            // Redirigir a una página de edición de usuario
+            window.location.href = `/Vista_AdminV2.0/editarUsua.html?id=${id}`;
+        }
+
+        function eliminarUsuario(id) {
+            if (confirm('¿Estás seguro de que deseas eliminar este usuario?')) {
+                fetch(`/api/usuarios/${id}`, {
+                    method: 'DELETE',
+                })
+                .then(response => {
+                    if (response.ok) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: '¡Usuario Eliminado!',
+                            text: 'Usuario eliminado exitosamente',
+                            toast: true,
+                            position: 'top',
+                            showConfirmButton: true,
+                            confirmButtonText: 'Aceptar',
+                            customClass: {
+                                confirmButton: 'custom-btn'
+                            }
+                        }).then(() => {
+                            document.location.reload(); // Recargar la lista de usuarios después de la alerta
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: '¡Hubo Un Error!',
+                            text: 'Error al eliminar el usuario',
+                            toast: true,
+                            position: 'top',
+                            showConfirmButton: true,
+                            confirmButtonText: 'Aceptar',
+                            customClass: {
+                                confirmButton: 'custom-btn'
+                            }
+                        });
+                    }                    
+                })
+                .catch(error => {
+                    console.error('Error al eliminar el usuario:', error);
+                    Swal.fire({
+                        icon: 'error',
+                            title: '¡Hubo Un Error!',
+                            text: 'Error al eliminar el usuario',
+                            toast: true,
+                            position: 'top',
+                            showConfirmButton: true,
+                            confirmButtonText: 'Aceptar',
+                            customClass: {
+                                confirmButton: 'custom-btn'
+                            }
+                    });
+                });
+            }
+        }
+    
+
+
+
+        let currentPage = 1;
+            let rowsPerPage = 5; // Default value
+            const tableBody = document.getElementById('table-body');
+            const rows = tableBody.getElementsByTagName('tr');
+            const totalRows = rows.length;
+            const paginationText = document.getElementById('pagination-text');
+            const pageNumber = document.getElementById('page-number');
+            
+            // Function to display rows based on current page and entries per page
+            function displayRows() {
+                const start = (currentPage - 1) * rowsPerPage;
+                const end = start + rowsPerPage;
+                for (let i = 0; i < totalRows; i++) {
+                    rows[i].style.display = i >= start && i < end ? '' : 'none';
+                }
+                pageNumber.innerText = currentPage;
+            }
+        
+            // Update rows per page based on select option
+            document.getElementById('entries').addEventListener('change', function() {
+                rowsPerPage = parseInt(this.value);
+                currentPage = 1;
+                displayRows();
+            });
+        
+            // Search functionality
+            document.getElementById('search').addEventListener('keyup', function() {
+                const searchText = this.value.toLowerCase();
+                let visibleRows = 0;
+                for (let i = 0; i < totalRows; i++) {
+                    const rowText = rows[i].innerText.toLowerCase();
+                    rows[i].style.display = rowText.includes(searchText) ? '' : 'none';
+                    if (rows[i].style.display === '') visibleRows++;
+                }
+            });
+        
+            // Pagination controls
+            document.getElementById('first').addEventListener('click', function(e) {
+                e.preventDefault();
+                currentPage = 1;
+                displayRows();
+            });
+        
+            document.getElementById('previous').addEventListener('click', function(e) {
+                e.preventDefault();
+                if (currentPage > 1) {
+                    currentPage--;
+                    displayRows();
+                }
+            });
+        
+            document.getElementById('next').addEventListener('click', function(e) {
+                e.preventDefault();
+                if (currentPage * rowsPerPage < totalRows) {
+                    currentPage++;
+                    displayRows();
+                }
+            });
+        
+            document.getElementById('last').addEventListener('click', function(e) {
+                e.preventDefault();
+                currentPage = Math.ceil(totalRows / rowsPerPage);
+                displayRows();
+            });
+        
+            // Initialize display
+            displayRows();
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="menu.js"></script>
+
+</body>
+</html>
+

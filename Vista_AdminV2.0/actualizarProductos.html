@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style5.css">
+    <title>Actualizar Producto</title>
+</head>
+
+
+<body>
+
+    <div class="side-menu">
+        <div class="brand-name">
+            <h1>¡Bienvenido Administrador!</h1>
+        </div>
+        <div class="menu-links">
+            <a href="/Vista_AdminV2.0/agregarUsua.html" class="menu-item">Agregar Usuarios</a>
+            <a href="/Vista_AdminV2.0/actualizarUsua.html" class="menu-item">Ver Usuarios</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <div class="nav">
+                <div class="toggle-menu">
+                    <button id="menu-toggle" class="btn">☰ Menú</button>
+                </div>
+                <img src="img/logo.png" alt="Logo">
+                <div class="user">
+                    <a href="index.html" class="btn">Pedidos</a>
+                    <a href="menu.html" class="btn">Menú</a>
+                    <a href="Agregarmenu.html" class="btn">Agregar Producto</a>
+                    <a href="/index.html" class="btn">Salir</a>
+                </div>
+            </div>
+        </div>
+
+
+    
+        <div class="container1">
+            <h1>Actualizar Producto</h1>
+            <form id="updateForm">
+                <label for="tipo" style="margin-top: 20px">Tipo:</label>
+                <input type="text" id="tipo" name="tipo" required><br><br>
+                
+                <label for="descripcion">Descripción:</label>
+                <textarea id="descripcion" name="descripcion" required></textarea><br><br>
+                
+                <label for="precio">Precio:</label>
+                <input type="number" id="precio" name="precio" required step="0.01" min="0"> <!-- min="0" evita precios negativos -->
+                
+                <button class="button" type="submit" value="Actualizar">Actualizar</button>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        // Obtener el ID del producto de la URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const productoId = urlParams.get('id');
+
+        // Obtener los datos del producto desde el servidor y rellenar el formulario
+        fetch(`/api/productos/${productoId}`)
+            .then(response => response.json())
+            .then(producto => {
+                document.getElementById('tipo').value = producto.tipo;
+                document.getElementById('descripcion').value = producto.descripcion;
+                document.getElementById('precio').value = producto.precio;
+            })
+            .catch(error => console.error('Error al obtener el producto:', error));
+
+        // Enviar la actualización del producto al servidor
+        document.getElementById('updateForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const updatedProduct = {
+                tipo: document.getElementById('tipo').value,
+                descripcion: document.getElementById('descripcion').value,
+                precio: document.getElementById('precio').value
+            };
+
+            fetch(`/api/productos/${productoId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(updatedProduct)
+            })
+            .then(response => response.json())
+            .then(data => {
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Producto Actualizado!',
+                    text: 'Producto actualizado exitosamente',
+                    toast: true,
+                    position: 'top',
+                    showConfirmButton: true,
+                    confirmButtonText: 'Aceptar',
+                    customClass: {
+                        confirmButton: 'custom-btn'
+                    }
+        }).then(() => {
+            window.location.href = 'menu.html'; // Volver al menú después de actualizar
+        });
+    })
+    .catch(error => {
+        console.error('Error al actualizar el producto:', error);
+                Swal.fire({
+                    icon : 'error',
+                    title: '¡Hubo Un Error!',
+                    text: 'No se pudo actualizar el producto.',
+                    toast: true,
+                    position: 'top',
+                    showConfirmButton: true,
+                    confirmButtonText: 'Aceptar',
+                    customClass: {
+                        confirmButton: 'custom-btn'
+                    }
+                });
+    });
+});
+    </script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> 
+    <script src="menu.js"></script>
+
+</body>
+</html>
