@@ -549,7 +549,7 @@ app.put('/api/productos/:id', (req, res) => {
 app.post('/guardarprod', (req, res) => {
     const { tipo, descripcion, precio } = req.body;
 
-    const query = 'INSERT INTO producto (tipo, descripcion, precio) VALUES (?, ?, ?)';
+    const query = 'INSERT INTO Producto (tipo, descripcion, precio) VALUES (?, ?, ?)';
     connection.query(query, [tipo, descripcion, precio], (error, results) => {
         if (error) {
             console.error('Error al guardar el producto:', error);
