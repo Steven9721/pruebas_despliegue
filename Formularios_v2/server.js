@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const connection = require('./db'); // Asegúrate de que este archivo de configuración de la base de datos esté correctamente configurado
 const nodemailer = require('nodemailer');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 const app = express();
 const port = process.env.PORT || 3000;
