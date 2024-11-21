@@ -517,7 +517,7 @@ app.get('/api/productos', (req, res) => {
 // Eliminar un producto por ID
 app.delete('/api/productos/:id', (req, res) => {
     const { id } = req.params;
-    const query = 'DELETE FROM producto WHERE id_producto = ?';
+    const query = 'DELETE FROM Producto WHERE id_producto = ?';
     
     connection.query(query, [id], (error, results) => {
         if (error) {
@@ -535,7 +535,7 @@ app.put('/api/productos/:id', (req, res) => {
     const { tipo, descripcion, precio } = req.body;
 
     // Lógica para actualizar el producto en la base de datos
-    const query = 'UPDATE producto SET tipo = ?, descripcion = ?, precio = ? WHERE id_producto = ?';
+    const query = 'UPDATE Producto SET tipo = ?, descripcion = ?, precio = ? WHERE id_producto = ?';
     
     connection.query(query, [tipo, descripcion, precio, id], (error, results) => {
         if (error) {
