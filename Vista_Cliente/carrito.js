@@ -148,7 +148,7 @@ function completePurchase() {
             confirmButton: 'custom-btn'
         }
     }).then(() => {
-        window.location.href = '../vista_cliente/historial.html';
+        window.location.href = 'historial.html';
     });
 }
 
