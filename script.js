@@ -154,7 +154,7 @@ function addToCart(productId) {
 
     // Agregar listener al botón "Pagar"
     document.getElementById('payButton')?.addEventListener('click', () => {
-        window.location.href = '../vista_cliente/carrito3.html';
+        window.location.href = '../Vista_Cliente/carrito3.html';
     });
 }
 
