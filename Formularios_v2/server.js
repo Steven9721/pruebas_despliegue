@@ -437,13 +437,29 @@ function eliminarCuenta(userId) {
 }
 
 
+// Configuración de nodemailer
+const transporter = nodemailer.createTransport({
+    service: 'gmail', // O el servicio que uses (Hotmail, Outlook, etc.)
+    auth: {
+        user: 'trolbillo@gmail.com', // Tu correo
+        pass: 'ehad wcqu xkpx xpoh', // Contraseña de aplicación generada
+    },
+});
 
+// Función para generar una contraseña aleatoria
+function generarNuevaContraseña() {
+    const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let contraseña = '';
+    for (let i = 0; i < 8; i++) {
+        contraseña += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
+    }
+    return contraseña;
+}
 
 // Ruta para manejar la solicitud de restablecimiento de contraseña
 app.post('/solicitar-reset', (req, res) => {
     const { email } = req.body;
 
-    // Busca al usuario en la base de datos por su correo
     const sql = `
         SELECT 'Cliente' AS rol, id_cliente AS id FROM Cliente WHERE correo_cli = ?
         UNION 
@@ -464,8 +480,8 @@ app.post('/solicitar-reset', (req, res) => {
             return res.status(404).json({ success: false, message: 'No se encontró un usuario con ese correo' });
         }
 
-        // Generar una nueva contraseña y actualizar en la base de datos
-        const nuevaContraseña = generarNuevaContraseña(); // Debes implementar esta función
+        // Generar nueva contraseña
+        const nuevaContraseña = generarNuevaContraseña();
 
         let updateSql;
         const userId = results[0].id;
@@ -493,15 +509,32 @@ app.post('/solicitar-reset', (req, res) => {
                 return res.status(500).json({ success: false, message: 'Error al actualizar la contraseña' });
             }
 
-            console.log('Contraseña restablecida con éxito para el usuario:', userId);
-            // Enviar la nueva contraseña en la respuesta
-            res.status(200).json({
-                success: true,
-                newPassword: nuevaContraseña // Enviar la nueva contraseña en la respuesta
+            // Configuración del correo
+            const mailOptions = {
+                from: 'trolbillo@gmail.com',
+                to: email,
+                subject: 'Restablecimiento de contraseña',
+                text: `Hola, tu nueva contraseña es: ${nuevaContraseña}`,
+            };
+
+            // Enviar correo con la nueva contraseña
+            transporter.sendMail(mailOptions, (err, info) => {
+                if (err) {
+                    console.error('Error al enviar el correo:', err);
+                    return res.status(500).json({ success: false, message: 'Error al enviar el correo' });
+                }
+
+                console.log('Correo enviado:', info.response);
+                res.status(200).json({
+                    success: true,
+                    message: 'Contraseña restablecida y enviada por correo',
+                });
             });
         });
     });
 });
+
+
 
 app.get('/api/productos', (req, res) => {
     connection.query('SELECT * FROM Producto', (error, results) => {

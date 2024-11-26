@@ -23,7 +23,7 @@ document.getElementById('resetPasswordForm').addEventListener('submit', function
             // Mostrar la nueva contraseña en una alerta de SweetAlert
             Swal.fire({
                 title: '¡Contraseña restablecida!',
-                text: `Su nueva contraseña es: ${data.newPassword}`,
+                text: `Su nueva contraseña fue enviada al correo digitado`,
                 icon: 'success',
                 toast: true,
                 confirmButtonText: 'Aceptar',
@@ -53,7 +53,7 @@ document.getElementById('resetPasswordForm').addEventListener('submit', function
         console.error('Error:', error);
         Swal.fire({
             title: 'Error',
-            text: 'Error al restablecer la contraseña.',
+            text: 'Correo no valido',
             icon: 'error',
             toast: true,
             position: 'top',
